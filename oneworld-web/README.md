@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# oneworld-web
 
-## Getting Started
+一世界 V1 前端 / 轻后端一体化骨架项目。
 
-First, run the development server:
+## 启动
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 质量检查
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run lint
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prisma（当前为起步草案）
 
-## Learn More
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
 
-To learn more about Next.js, take a look at the following resources:
+> 当前已内置 `prisma/schema.prisma` 与 `prisma/seed.ts` 起步稿，后续可继续接 PostgreSQL 实库。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 当前 API 路由草案
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `GET /api/opc/industries`
+- `GET /api/opc/industries/:industrySlug/projects`
+- `GET /api/workflow/industries`
+- `GET /api/workflow/industries/:industrySlug/roles`
+- `GET /api/workflow/roles/:roleSlug/scenes`
+- `GET /api/workspace/overview`
+- `GET /api/auth/me`
 
-## Deploy on Vercel
+## 环境变量
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+复制 `.env.example` 为 `.env.local` 后填写：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cp .env.example .env.local
+```

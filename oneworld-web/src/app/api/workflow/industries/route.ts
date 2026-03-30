@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
-import { workflowIndustries } from "@/server/api-data";
+import { prisma } from "@/server/prisma";
 
 export async function GET() {
-  return NextResponse.json({ items: workflowIndustries });
+  const items = await prisma.industry.findMany({
+    where: {
+      type: { in: ["workflow", "both"] },
+      status: "active",
+    },
+    orderBy: { sortOrder: "asc" },
+    include: {
+      workflowRoles: true,
+    },
+  });
+
+  return NextResponse.json({
+    items: items.map((item) => ({
+      name: item.name,
+      slug: item.slug,
+      description: item.description,
+      count: item.workflowRoles.length,
+    })),
+  });
 }

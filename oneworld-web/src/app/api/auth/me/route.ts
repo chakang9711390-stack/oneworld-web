@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/server/api-data";
+import { prisma } from "@/server/prisma";
 
 export async function GET() {
-  return NextResponse.json(currentUser);
+  const user = await prisma.user.findFirst();
+
+  return NextResponse.json(
+    user
+      ? {
+          id: user.id,
+          email: user.email,
+          nickname: user.nickname,
+        }
+      : null,
+  );
 }

@@ -1,8 +1,25 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+import { headers } from "next/headers";
+
+async function resolveBaseUrl() {
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+
+  const headerStore = await headers();
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const proto = headerStore.get("x-forwarded-proto") ?? "http";
+
+  if (!host) {
+    return "http://127.0.0.1:3000";
+  }
+
+  return `${proto}://${host}`;
+}
 
 async function request<T>(path: string): Promise<T> {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    cache: 'no-store',
+  const baseUrl = await resolveBaseUrl();
+  const response = await fetch(`${baseUrl}${path}`, {
+    cache: "no-store",
   });
 
   if (!response.ok) {
@@ -14,7 +31,7 @@ async function request<T>(path: string): Promise<T> {
 
 export async function getOpcIndustries() {
   return request<{ items: Array<{ name: string; slug: string; description: string; count: number }> }>(
-    '/api/opc/industries',
+    "/api/opc/industries",
   );
 }
 
@@ -27,7 +44,7 @@ export async function getOpcProjects(industrySlug: string) {
 
 export async function getWorkflowIndustries() {
   return request<{ items: Array<{ name: string; slug: string; description: string; count: number }> }>(
-    '/api/workflow/industries',
+    "/api/workflow/industries",
   );
 }
 
@@ -53,5 +70,5 @@ export async function getWorkspaceOverview() {
     opcSummary: string;
     workflowSummary: string;
     projectSummary: string;
-  }>('/api/workspace/overview');
+  }>("/api/workspace/overview");
 }

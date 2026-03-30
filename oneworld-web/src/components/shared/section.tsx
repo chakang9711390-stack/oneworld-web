@@ -7,15 +7,17 @@ export function PageShell({ children }: { children: ReactNode }) {
 
 export function Hero() {
   return (
-    <section className="shell-card grid gap-6 overflow-hidden rounded-[34px] px-8 py-12 shadow-[0_24px_80px_rgba(0,0,0,.42)] md:px-12">
+    <section className="shell-card grid gap-6 overflow-hidden rounded-[34px] px-8 py-12 shadow-[0_24px_80px_rgba(0,0,0,.18)] md:px-12">
       <h1 className="text-center text-4xl font-semibold tracking-[-0.04em] md:text-6xl">
         OPC / 工作流一键生成平台
       </h1>
       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
-        <div className="flex min-h-14 items-center rounded-[20px] border border-white/10 bg-white/4 px-5 text-sm text-white/70">
+        <div className="flex min-h-14 items-center rounded-[20px] border border-[var(--line)] bg-[var(--panel-soft)] px-5 text-sm text-[var(--text-soft)]">
           我想找到适合自己的 OPC，或者直接进入产品工作流
         </div>
-        <button className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black">开始探索</button>
+        <Link href="/opc" className="inline-flex items-center justify-center rounded-full bg-[var(--button-primary-bg)] px-6 py-3 text-sm font-semibold text-[var(--button-primary-text)] transition hover:opacity-92">
+          开始探索
+        </Link>
       </div>
     </section>
   );

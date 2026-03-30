@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>一世界｜高保真交互原型 v1</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060606;
+      --bg-2: #0b0b0c;
+      --bg-3: #101012;
+      --panel: rgba(255,255,255,0.038);
+      --panel-strong: rgba(255,255,255,0.055);
+      --panel-soft: rgba(255,255,255,0.024);
+      --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.16);
+      --text: rgba(255,255,255,0.94);
+      --text-soft: rgba(255,255,255,0.44);
+      --text-faint: rgba(255,255,255,0.28);
+      --primary: #f4f4f2;
+      --primary-2: #d6d6d2;
+      --shadow: 0 24px 80px rgba(0,0,0,.42);
+      --shadow-soft: 0 16px 40px rgba(0,0,0,.22);
+      --radius-2xl: 32px;
+      --radius-xl: 26px;
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --content: 1440px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #ebe7e1;
+      --bg-2: #e5e0d8;
+      --bg-3: #ddd8cf;
+      --panel: rgba(248,245,240,0.76);
+      --panel-strong: rgba(250,247,242,0.9);
+      --panel-soft: rgba(246,242,236,0.62);
+      --line: rgba(34, 31, 28, 0.08);
+      --line-strong: rgba(34, 31, 28, 0.14);
+      --text: rgba(28,26,24,0.92);
+      --text-soft: rgba(28,26,24,0.58);
+      --text-faint: rgba(28,26,24,0.36);
+      --primary: #2a2825;
+      --primary-2: #4a4640;
+      --shadow: 0 18px 56px rgba(34,30,26,.07);
+      --shadow-soft: 0 12px 32px rgba(34,30,26,.05);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 18%, rgba(255,255,255,.06), transparent 22%),
+        radial-gradient(circle at 82% 12%, rgba(255,255,255,.04), transparent 20%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 46%, var(--bg-3) 100%);
+      color: var(--text);
+      transition: background .35s ease, color .25s ease;
+    }
+    body {
+      position: relative;
+      letter-spacing: -0.01em;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(16px);
+      opacity: .75;
+    }
+    body::before {
+      width: 36vw;
+      height: 36vw;
+      min-width: 320px;
+      min-height: 320px;
+      top: -10vw;
+      right: -8vw;
+      background: radial-gradient(circle, rgba(255,255,255,.06), transparent 62%);
+    }
+    body::after {
+      width: 28vw;
+      height: 28vw;
+      min-width: 260px;
+      min-height: 260px;
+      left: -8vw;
+      bottom: -6vw;
+      background: radial-gradient(circle, rgba(255,255,255,.045), transparent 64%);
+    }
+
+    ::selection { background: rgba(255,255,255,.14); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.14);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    html[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.16); background-clip: padding-box; }
+
+    button, input { font: inherit; }
+    button { outline: none; }
+    body.modal-open { overflow: hidden; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      background: linear-gradient(180deg, rgba(8,8,9,.74), rgba(8,8,9,.56));
+      border-bottom: 1px solid var(--line);
+    }
+    html[data-theme="light"] .topbar {
+      background: linear-gradient(180deg, rgba(235,231,225,.86), rgba(235,231,225,.72));
+    }
+    .topbar-inner {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 18px 28px;
+      display: grid;
+      grid-template-columns: 220px 1fr 220px;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
+    }
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: var(--text);
+      font-weight: 800;
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.03)),
+        rgba(255,255,255,.04);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), var(--shadow-soft);
+    }
+    html[data-theme="light"] .brand-mark {
+      background:
+        linear-gradient(180deg, rgba(252,249,244,.76), rgba(244,239,232,.6)),
+        rgba(243,238,231,.68);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-btn, .ghost, .primary, .chip-btn, .tab-btn {
+      border: 0;
+      cursor: pointer;
+      transition: transform .22s ease, background .22s ease, color .22s ease, border-color .22s ease, box-shadow .22s ease, opacity .22s ease;
+      white-space: nowrap;
+    }
+    .nav-btn {
+      min-width: 92px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      color: var(--text-soft);
+      background: transparent;
+      text-align: center;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--text);
+      border-color: var(--line);
+      background: rgba(255,255,255,.05);
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      align-items: center;
+    }
+    .ghost {
+      background: var(--panel-soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+      padding: 11px 16px;
+      border-radius: 999px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .ghost:hover { transform: translateY(-1px); background: rgba(255,255,255,.06); }
+    html[data-theme="light"] .ghost:hover { background: rgba(248,244,238,.94); }
+
+    .primary {
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+      color: #060606;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    }
+    .primary:hover { transform: translateY(-1px); box-shadow: 0 16px 36px rgba(0,0,0,.24); }
+    html[data-theme="light"] .primary { color: #f4efe8; box-shadow: 0 10px 24px rgba(28,24,20,.1); }
+
+    .layout {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content);
+      margin: 0 auto;
+      padding: 34px 28px 54px;
+    }
+    .main { display: grid; gap: 24px; align-content: start; }
+
+    .hero {
+      min-height: 360px;
+      border-radius: 34px;
+      padding: 46px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+        linear-gradient(135deg, rgba(255,255,255,.04), transparent 60%),
+        rgba(255,255,255,.03);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      pointer-events: none;
+    }
+    .hero::before {
+      width: 420px;
+      height: 420px;
+      top: -180px;
+      right: -120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.08), transparent 62%);
+      filter: blur(8px);
+    }
+    .hero::after {
+      left: 32px;
+      right: 32px;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+    }
+    html[data-theme="light"] .hero {
+      background:
+        linear-gradient(180deg, rgba(249,246,241,.8), rgba(241,236,229,.64)),
+        linear-gradient(135deg, rgba(255,252,247,.28), transparent 60%),
+        rgba(242,237,230,.58);
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 18px;
+      min-height: 58px;
+      border-radius: 20px;
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    html[data-theme="light"] .search { background: rgba(246,241,235,.72); }
+    .search span {
+      color: var(--text-faint);
+      font-size: 15px;
+    }
+    .search input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      outline: none;
+      font-size: 15px;
+    }
+    .search input::placeholder { color: var(--text-faint); }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+
+    .card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    html[data-theme="light"] .card {
+      background:
+        linear-gradient(180deg, rgba(250,247,242,.82), rgba(242,236,229,.7)),
+        var(--panel);
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 22%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .card > * { position: relative; z-index: 1; }
+
+    .entry-card {
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform .24s ease, border-color .24s ease, background .24s ease, box-shadow .24s ease;
+    }
+    .entry-card:hover,
+    .opc-category-card:hover,
+    .workflow-role-card:hover,
+    .row-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow);
+    }
+
+    .opc-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .opc-category-card {
+      min-height: 224px;
+      display: grid;
+      gap: 12px;
+      align-content: space-between;
+      cursor: pointer;
+    }
+
+    .opc-category-card h3,
+    .opc-project-card h3,
+    .workflow-role-card h3,
+    .workflow-scene-card h3,
+    .entry-card h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      font-weight: 650;
+    }
+
+    .opc-category-card p,
+    .opc-project-card p,
+    .workflow-role-card p,
+    .workflow-scene-card p {
+      margin: 0;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .opc-project-card {
+      min-height: 258px;
+      display: grid;
+      gap: 16px;
+      align-content: space-between;
+      cursor: default;
+    }
+    .opc-project-card.disabled,
+    .workflow-scene-card.disabled { opacity: .96; }
+
+    .opc-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-soft);
+      font-size: 14px;
+      margin-bottom: 2px;
+      flex-wrap: wrap;
+    }
+    .opc-breadcrumb button {
+      background: transparent;
+      border: 0;
+      color: var(--text-soft);
+      cursor: pointer;
+      padding: 0;
+      transition: color .2s ease;
+    }
+    .opc-breadcrumb button:hover { color: var(--text); }
+
+    .opc-card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .opc-create-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+      border: 1px solid var(--line-strong);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .workflow-role-card {
+      min-height: 220px;
+      display: grid;
+      gap: 12px;
+      align-content: space-between;
+      cursor: pointer;
+    }
+    .workflow-scene-card {
+      min-height: 242px;
+      display: grid;
+      gap: 16px;
+      align-content: space-between;
+      cursor: default;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 650;
+    }
+    .section-title p {
+      margin: 8px 0 0;
+      color: var(--text-soft);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip-btn {
+      background: var(--panel-soft);
+      color: var(--text-soft);
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+    }
+
+    .list { display: grid; gap: 14px; }
+    .row-card {
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      cursor: pointer;
+      transition: .22s ease;
+    }
+    html[data-theme="light"] .row-card { background: rgba(245,240,234,.68); }
+
+    .row-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .row-head p { margin: 6px 0 0; color: var(--text-soft); }
+
+    .status {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--line);
+      white-space: nowrap;
+      color: var(--text);
+      background: rgba(255,255,255,.05);
+    }
+    .status.live,
+    .status.plan,
+    .status.proto {
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .detail-wrap { display: grid; gap: 18px; margin-top: 28px; }
+    .detail-block, .metric {
+      background: var(--panel-soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+    }
+    html[data-theme="light"] .detail-block,
+    html[data-theme="light"] .metric { background: rgba(245,240,234,.68); }
+
+    .detail-block h4 { margin: 0 0 12px; font-size: 16px; }
+    .detail-block ul { margin: 0; padding-left: 18px; color: var(--text-soft); line-height: 1.8; }
+    .detail-block p { margin: 0; color: var(--text-soft); line-height: 1.8; }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+    .metric strong {
+      display: block;
+      font-size: 34px;
+      margin-top: 12px;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      font-weight: 650;
+    }
+    .metric span { color: var(--text-soft); font-size: 13px; line-height: 1.7; }
+
+    .hidden { display: none !important; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.56);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    html[data-theme="light"] .modal-overlay { background: rgba(31, 28, 24, 0.14); }
+    .modal-overlay.show { display: flex; }
+
+    .modal-panel {
+      width: min(640px, 100%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)),
+        #0d0d0f;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: 28px;
+      box-shadow: 0 34px 90px rgba(0,0,0,.46);
+      position: relative;
+    }
+    html[data-theme="light"] .modal-panel {
+      background:
+        linear-gradient(180deg, rgba(251,248,244,.94), rgba(241,236,229,.84)),
+        #f3eee7;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel-soft);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tab-btn {
+      flex: 1;
+      height: 48px;
+      border-radius: 14px;
+      background: var(--panel-soft);
+      color: var(--text-soft);
+      border: 1px solid var(--line);
+    }
+    .tab-btn.active {
+      color: var(--text);
+      border-color: var(--line-strong);
+      background: rgba(255,255,255,.07);
+    }
+
+    .auth-pane { display: none; }
+    .auth-pane.show { display: grid; gap: 14px; }
+
+    @media (max-width: 1180px) {
+      .grid-3, .workspace-grid, .opc-card-grid, .grid-4 { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner { grid-template-columns: 1fr; padding-left: 16px; padding-right: 16px; }
+      .layout { padding-left: 16px; padding-right: 16px; }
+      .top-actions, .nav { justify-content: flex-start; }
+      .hero { padding: 24px; min-height: 300px; border-radius: 26px; }
+      .hero h1 { font-size: 32px; }
+      .search-row { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">一</div>
+        <div>一世界</div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-go="home">首页</button>
+        <button class="nav-btn" data-go="opc">OPC</button>
+        <button class="nav-btn" data-go="workflow">工作流</button>
+        <button class="nav-btn" data-go="workspace">我的工作台</button>
+      </nav>
+      <div class="top-actions">
+        <button class="ghost" id="toggleTheme">深浅切换</button>
+        <button class="ghost" id="openLogin">登录</button>
+        <button class="primary" id="openSignup">注册</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main class="main">
+      <section class="hero" id="homeHero">
+        <div style="display:flex;justify-content:center;align-items:center;">
+          <h1>OPC / 工作流一键生成平台</h1>
+        </div>
+        <div class="search-row" id="homeSearch">
+          <div class="search">
+            <span>⌕</span>
+            <input value="我想找到适合自己的 OPC，或者直接进入产品工作流" />
+          </div>
+          <button class="primary">开始探索</button>
+        </div>
+      </section>
+
+      <section id="screen-home" class="screen">
+        <div class="grid-3">
+          <div class="card entry-card" data-screen-jump="opc-list">
+            <div><h3 style="margin-top:18px;font-size:28px;">OPC 方案库</h3></div>
+            <div style="display:flex;justify-content:flex-end;align-items:center;"><strong>进入 →</strong></div>
+          </div>
+          <div class="card entry-card" data-screen-jump="workflow-list">
+            <div><h3 style="margin-top:18px;font-size:28px;">工作流库</h3></div>
+            <div style="display:flex;justify-content:flex-end;align-items:center;"><strong>进入 →</strong></div>
+          </div>
+          <div class="card entry-card" data-screen-jump="workspace">
+            <div><h3 style="margin-top:18px;font-size:28px;">我的工作台</h3></div>
+            <div style="display:flex;justify-content:flex-end;align-items:center;"><strong>进入 →</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-opc-list" class="screen hidden">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>OPC 行业库</h2>
+              <p>先搜索或浏览行业分类，进入后再查看该行业下的 OPC 项目卡片库。</p>
+            </div>
+          </div>
+          <div class="search" style="margin-top: 22px;">
+            <span>⌕</span>
+            <input placeholder="搜索行业，例如：内容创业、咨询顾问、教育培训、软件服务" />
+          </div>
+        </div>
+
+        <div id="opc-category-view" style="margin-top: 24px;">
+          <div class="opc-card-grid">
+            <div class="card opc-category-card" data-opc-category="content">
+              <div>
+                <h3>内容创业</h3>
+                <p>围绕内容、IP、社群、知识表达建立一人公司路径。</p>
+              </div>
+              <div class="opc-card-meta"><span>12 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-opc-category="consulting">
+              <div>
+                <h3>咨询顾问</h3>
+                <p>适合输出策略、方案、诊断与顾问式交付的业务模型。</p>
+              </div>
+              <div class="opc-card-meta"><span>8 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-opc-category="education">
+              <div>
+                <h3>教育培训</h3>
+                <p>覆盖课程、训练营、教学服务与知识陪跑等方向。</p>
+              </div>
+              <div class="opc-card-meta"><span>10 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-opc-category="software">
+              <div>
+                <h3>软件服务</h3>
+                <p>适合轻 SaaS、工具产品、自动化服务与技术型个体业务。</p>
+              </div>
+              <div class="opc-card-meta"><span>6 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-opc-category="ecommerce">
+              <div>
+                <h3>电商与零售</h3>
+                <p>围绕选品、渠道、内容转化与私域经营搭建变现模型。</p>
+              </div>
+              <div class="opc-card-meta"><span>9 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-opc-category="service">
+              <div>
+                <h3>本地与专业服务</h3>
+                <p>面向本地经营、专业服务、小团队外包与轻服务交付场景。</p>
+              </div>
+              <div class="opc-card-meta"><span>7 个 OPC 项目</span><strong>进入 →</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="opc-project-view" class="hidden" style="margin-top: 24px; display: grid; gap: 20px;">
+          <div class="card">
+            <div class="opc-breadcrumb">
+              <button id="opcBackToCategories">← 返回行业库</button>
+              <span>/</span>
+              <span id="opcCurrentCategory">内容创业</span>
+            </div>
+            <div class="section-title" style="margin-top: 10px;">
+              <div>
+                <h2 id="opcProjectTitle">内容创业 OPC 项目卡片库</h2>
+                <p>第一个卡片固定为“创建我的 OPC”，其余为该行业下的 OPC 项目案例卡片，当前先全部做成不可点击展示。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <div class="card opc-project-card disabled">
+              <div class="opc-create-badge">+</div>
+              <div>
+                <h3>创建我的 OPC</h3>
+                <p>从当前行业出发，创建属于我自己的 OPC 项目结构。</p>
+              </div>
+              <div class="opc-card-meta"><span>暂不开放点击</span><span>创建入口</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>知识 IP 变现型 OPC</h3>
+                <p>通过内容输出、知识产品和私域承接形成持续变现闭环。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>高客单咨询成交型 OPC</h3>
+                <p>围绕认知输出、咨询诊断与方案交付构建成交路径。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>训练营转化型 OPC</h3>
+                <p>通过训练营产品、服务承接与复购链路放大收益模型。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>工具产品订阅型 OPC</h3>
+                <p>围绕工具能力、自动化服务与订阅收费形成产品型收入。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>私域社群经营型 OPC</h3>
+                <p>通过社群内容、陪跑服务与多层产品结构构建经营闭环。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>模板服务交付型 OPC</h3>
+                <p>把经验方法产品化，沉淀成标准模板、脚本和交付服务。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card opc-project-card disabled">
+              <div>
+                <h3>轻咨询陪跑型 OPC</h3>
+                <p>通过低门槛咨询入口 + 陪跑服务提升成交率和用户生命周期价值。</p>
+              </div>
+              <div class="opc-card-meta"><span>案例卡片</span><span>暂不可点击</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-workflow-list" class="screen hidden">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>工作流行业库</h2>
+              <p>先搜索或浏览行业分类，再进入该行业下的职位卡片库与工作场景库。</p>
+            </div>
+          </div>
+          <div class="search" style="margin-top: 22px;">
+            <span>⌕</span>
+            <input placeholder="搜索行业，例如：互联网产品、内容运营、教育培训、咨询服务" />
+          </div>
+        </div>
+
+        <div id="workflow-industry-view" style="margin-top: 24px;">
+          <div class="opc-card-grid">
+            <div class="card opc-category-card" data-workflow-industry="互联网产品">
+              <div>
+                <h3>互联网产品</h3>
+                <p>覆盖产品规划、需求管理、项目推进与跨团队协作等工作场景。</p>
+              </div>
+              <div class="opc-card-meta"><span>6 个职位</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-workflow-industry="内容与运营">
+              <div>
+                <h3>内容与运营</h3>
+                <p>围绕选题、内容生产、活动运营、增长转化与用户维护展开。</p>
+              </div>
+              <div class="opc-card-meta"><span>5 个职位</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-workflow-industry="咨询与服务">
+              <div>
+                <h3>咨询与服务</h3>
+                <p>适用于方案咨询、客户服务、交付推进与顾问型业务协同。</p>
+              </div>
+              <div class="opc-card-meta"><span>4 个职位</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-workflow-industry="教育培训">
+              <div>
+                <h3>教育培训</h3>
+                <p>涵盖课程设计、教学运营、班级管理与学习服务支持。</p>
+              </div>
+              <div class="opc-card-meta"><span>5 个职位</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-workflow-industry="软件服务">
+              <div>
+                <h3>软件服务</h3>
+                <p>包括产品实施、客户成功、解决方案支持与服务流程管理。</p>
+              </div>
+              <div class="opc-card-meta"><span>4 个职位</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card opc-category-card" data-workflow-industry="品牌营销">
+              <div>
+                <h3>品牌营销</h3>
+                <p>适用于品牌策划、营销投放、传播执行与内容协同等任务。</p>
+              </div>
+              <div class="opc-card-meta"><span>5 个职位</span><strong>进入 →</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="workflow-role-view" class="hidden" style="margin-top: 24px; display: grid; gap: 20px;">
+          <div class="card">
+            <div class="opc-breadcrumb">
+              <button id="workflowBackToIndustry">← 返回行业库</button>
+              <span>/</span>
+              <span id="workflowCurrentIndustry">互联网产品</span>
+            </div>
+            <div class="section-title" style="margin-top: 10px;">
+              <div>
+                <h2 id="workflowRoleTitle">互联网产品｜职位卡片库</h2>
+                <p>展示该行业下的所有职位卡片，点击职位后进入工作场景库。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="opc-card-grid" id="workflow-role-grid">
+            <div class="card workflow-role-card" data-workflow-role="产品经理">
+              <div>
+                <h3>产品经理</h3>
+                <p>负责需求梳理、产品方案设计、项目协同与版本推进。</p>
+              </div>
+              <div class="opc-card-meta"><span>8 个工作场景</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card workflow-role-card" data-workflow-role="产品运营">
+              <div>
+                <h3>产品运营</h3>
+                <p>负责活动推进、数据跟踪、用户触达与运营策略落地。</p>
+              </div>
+              <div class="opc-card-meta"><span>7 个工作场景</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card workflow-role-card" data-workflow-role="用户研究">
+              <div>
+                <h3>用户研究</h3>
+                <p>负责用户访谈、反馈整理、洞察分析与需求提炼。</p>
+              </div>
+              <div class="opc-card-meta"><span>6 个工作场景</span><strong>进入 →</strong></div>
+            </div>
+            <div class="card workflow-role-card" data-workflow-role="项目协同">
+              <div>
+                <h3>项目协同</h3>
+                <p>负责跨团队推进、进度对齐、风险跟踪与任务闭环。</p>
+              </div>
+              <div class="opc-card-meta"><span>6 个工作场景</span><strong>进入 →</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="workflow-scene-view" class="hidden" style="margin-top: 24px; display: grid; gap: 20px;">
+          <div class="card">
+            <div class="opc-breadcrumb">
+              <button id="workflowBackToRoles">← 返回职位库</button>
+              <span>/</span>
+              <span id="workflowSceneIndustry">互联网产品</span>
+              <span>/</span>
+              <span id="workflowCurrentRole">产品经理</span>
+            </div>
+            <div class="section-title" style="margin-top: 10px;">
+              <div>
+                <h2 id="workflowSceneTitle">互联网产品｜产品经理｜工作场景库</h2>
+                <p>第一个场景卡片固定为“生成我的工作流”，其余卡片为对应工作场景，当前先全部做成不可点击展示。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-4">
+            <div class="card workflow-scene-card disabled">
+              <div class="opc-create-badge">+</div>
+              <div>
+                <h3>生成我的工作流</h3>
+                <p>根据当前行业与职位，生成适合我的专属工作流结构。</p>
+              </div>
+              <div class="opc-card-meta"><span>暂不开放点击</span><span>生成入口</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>需求澄清</h3>
+                <p>用于整理需求背景、目标、约束条件与关键决策问题。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>PRD 生成</h3>
+                <p>基于已有输入快速生成结构化 PRD 初稿与核心模块内容。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>开发拆解</h3>
+                <p>把需求转化为研发可执行的任务拆解、模块分工与优先级。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>用户访谈整理</h3>
+                <p>整理访谈纪要、提炼洞察、归纳用户问题与机会点。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>版本排期规划</h3>
+                <p>基于目标与资源制定版本节奏、排期方案与关键里程碑。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>会议纪要生成</h3>
+                <p>自动生成会议纪要、待办事项、负责人分配与后续跟进建议。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+            <div class="card workflow-scene-card disabled">
+              <div>
+                <h3>项目风险检查</h3>
+                <p>识别项目推进过程中的风险点、阻塞项与需要提前处理的问题。</p>
+              </div>
+              <div class="opc-card-meta"><span>场景卡片</span><span>暂不可点击</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-workspace" class="screen hidden">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>我的工作台</h2>
+              <p>承接当前项目、当前 OPC 和工作流状态。</p>
+            </div>
+            <button class="primary">新建项目</button>
+          </div>
+        </div>
+        <div class="workspace-grid">
+          <div class="metric"><span>当前 OPC 运行状态</span><strong>02</strong><span>1 个在推进，1 个待补内容</span></div>
+          <div class="metric"><span>当前工作流运行状态</span><strong>05</strong><span>最近 7 天被调用 5 次</span></div>
+          <div class="metric"><span>项目数量</span><strong>03</strong><span>2 个进行中，1 个待启动</span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-panel">
+      <button class="modal-close" id="closeAuthModal">✕</button>
+      <div class="auth-tabs">
+        <button class="tab-btn active" id="tabLogin">登录</button>
+        <button class="tab-btn" id="tabSignup">注册</button>
+      </div>
+      <div class="auth-pane show" id="paneLogin">
+        <div class="search"><span>@</span><input placeholder="邮箱地址" value="akang@example.com" /></div>
+        <div class="search"><span>•</span><input placeholder="密码" type="password" value="12345678" /></div>
+        <button class="primary">邮箱登录</button>
+        <button class="ghost">Google 登录</button>
+        <button class="ghost">Apple 登录</button>
+      </div>
+      <div class="auth-pane" id="paneSignup">
+        <div class="search"><span>@</span><input placeholder="邮箱地址" /></div>
+        <div class="search"><span>•</span><input placeholder="设置密码" type="password" /></div>
+        <div class="search"><span>•</span><input placeholder="确认密码" type="password" /></div>
+        <button class="primary">邮箱注册</button>
+        <button class="ghost">Google 注册</button>
+        <button class="ghost">Apple 注册</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const screens = document.querySelectorAll('.screen');
+    const navButtons = document.querySelectorAll('.nav-btn');
+    const entryJumps = document.querySelectorAll('[data-screen-jump]');
+    const workflowIndustryCards = document.querySelectorAll('[data-workflow-industry]');
+    const workflowRoleCards = document.querySelectorAll('[data-workflow-role]');
+    const homeHero = document.getElementById('homeHero');
+    const opcCategoryCards = document.querySelectorAll('[data-opc-category]');
+    const opcCategoryView = document.getElementById('opc-category-view');
+    const opcProjectView = document.getElementById('opc-project-view');
+    const opcBackToCategories = document.getElementById('opcBackToCategories');
+    const opcCurrentCategory = document.getElementById('opcCurrentCategory');
+    const opcProjectTitle = document.getElementById('opcProjectTitle');
+    const workflowIndustryView = document.getElementById('workflow-industry-view');
+    const workflowRoleView = document.getElementById('workflow-role-view');
+    const workflowSceneView = document.getElementById('workflow-scene-view');
+    const workflowBackToIndustry = document.getElementById('workflowBackToIndustry');
+    const workflowBackToRoles = document.getElementById('workflowBackToRoles');
+    const workflowCurrentIndustry = document.getElementById('workflowCurrentIndustry');
+    const workflowRoleTitle = document.getElementById('workflowRoleTitle');
+    const workflowSceneIndustry = document.getElementById('workflowSceneIndustry');
+    const workflowCurrentRole = document.getElementById('workflowCurrentRole');
+    const workflowSceneTitle = document.getElementById('workflowSceneTitle');
+
+    function resetOpcView() {
+      if (opcCategoryView) opcCategoryView.classList.remove('hidden');
+      if (opcProjectView) opcProjectView.classList.add('hidden');
+    }
+
+    function openOpcCategory(name) {
+      if (opcCurrentCategory) opcCurrentCategory.textContent = name;
+      if (opcProjectTitle) opcProjectTitle.textContent = `${name} OPC 项目卡片库`;
+      if (opcCategoryView) opcCategoryView.classList.add('hidden');
+      if (opcProjectView) opcProjectView.classList.remove('hidden');
+    }
+
+    function resetWorkflowView() {
+      if (workflowIndustryView) workflowIndustryView.classList.remove('hidden');
+      if (workflowRoleView) workflowRoleView.classList.add('hidden');
+      if (workflowSceneView) workflowSceneView.classList.add('hidden');
+    }
+
+    function openWorkflowIndustry(name) {
+      if (workflowCurrentIndustry) workflowCurrentIndustry.textContent = name;
+      if (workflowRoleTitle) workflowRoleTitle.textContent = `${name}｜职位卡片库`;
+      if (workflowSceneIndustry) workflowSceneIndustry.textContent = name;
+      if (workflowIndustryView) workflowIndustryView.classList.add('hidden');
+      if (workflowRoleView) workflowRoleView.classList.remove('hidden');
+      if (workflowSceneView) workflowSceneView.classList.add('hidden');
+    }
+
+    function openWorkflowRole(name) {
+      const industry = workflowCurrentIndustry ? workflowCurrentIndustry.textContent : '当前行业';
+      if (workflowCurrentRole) workflowCurrentRole.textContent = name;
+      if (workflowSceneIndustry) workflowSceneIndustry.textContent = industry;
+      if (workflowSceneTitle) workflowSceneTitle.textContent = `${industry}｜${name}｜工作场景库`;
+      if (workflowRoleView) workflowRoleView.classList.add('hidden');
+      if (workflowSceneView) workflowSceneView.classList.remove('hidden');
+    }
+
+    function backToWorkflowRoles() {
+      if (workflowRoleView) workflowRoleView.classList.remove('hidden');
+      if (workflowSceneView) workflowSceneView.classList.add('hidden');
+    }
+
+    function showScreen(name) {
+      screens.forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`screen-${name}`);
+      if (target) target.classList.remove('hidden');
+      if (homeHero) homeHero.style.display = name === 'home' ? 'grid' : 'none';
+      if (name === 'opc-list') resetOpcView();
+      if (name === 'workflow-list') resetWorkflowView();
+      navButtons.forEach(btn => {
+        const active = btn.dataset.go === name || (btn.dataset.go === 'opc' && name === 'opc-list') || (btn.dataset.go === 'workflow' && name === 'workflow-list');
+        btn.classList.toggle('active', active);
+      });
+    }
+
+    navButtons.forEach(btn => btn.addEventListener('click', () => {
+      const map = { home: 'home', opc: 'opc-list', workflow: 'workflow-list', workspace: 'workspace' };
+      showScreen(map[btn.dataset.go] || 'home');
+    }));
+    entryJumps.forEach(card => card.addEventListener('click', () => showScreen(card.dataset.screenJump)));
+    opcCategoryCards.forEach(card => card.addEventListener('click', () => openOpcCategory(card.querySelector('h3').textContent.trim())));
+    if (opcBackToCategories) opcBackToCategories.addEventListener('click', resetOpcView);
+
+    workflowIndustryCards.forEach(card => card.addEventListener('click', () => openWorkflowIndustry(card.querySelector('h3').textContent.trim())));
+    workflowRoleCards.forEach(card => card.addEventListener('click', () => openWorkflowRole(card.querySelector('h3').textContent.trim())));
+    if (workflowBackToIndustry) workflowBackToIndustry.addEventListener('click', resetWorkflowView);
+    if (workflowBackToRoles) workflowBackToRoles.addEventListener('click', backToWorkflowRoles);
+
+    const authModal = document.getElementById('authModal');
+    const openLogin = document.getElementById('openLogin');
+    const openSignup = document.getElementById('openSignup');
+    const closeAuthModal = document.getElementById('closeAuthModal');
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const paneLogin = document.getElementById('paneLogin');
+    const paneSignup = document.getElementById('paneSignup');
+
+    function openModal(mode) {
+      authModal.classList.add('show');
+      document.body.classList.add('modal-open');
+      switchTab(mode);
+    }
+    function closeModal() {
+      authModal.classList.remove('show');
+      document.body.classList.remove('modal-open');
+    }
+    function switchTab(mode) {
+      const isLogin = mode === 'login';
+      tabLogin.classList.toggle('active', isLogin);
+      tabSignup.classList.toggle('active', !isLogin);
+      paneLogin.classList.toggle('show', isLogin);
+      paneSignup.classList.toggle('show', !isLogin);
+    }
+
+    openLogin.onclick = () => openModal('login');
+    openSignup.onclick = () => openModal('signup');
+    closeAuthModal.onclick = closeModal;
+    tabLogin.onclick = () => switchTab('login');
+    tabSignup.onclick = () => switchTab('signup');
+    authModal.onclick = (e) => { if (e.target === authModal) closeModal(); };
+
+    document.getElementById('toggleTheme').onclick = () => {
+      const root = document.documentElement;
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+    };
+  </script>
+</body>
+</html>

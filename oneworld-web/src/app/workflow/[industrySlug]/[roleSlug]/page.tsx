@@ -1,3 +1,4 @@
+import { CtaCard } from "@/components/shared/cta-card";
 import { GridCard, PageShell, SectionCard, SimpleBreadcrumb } from "@/components/shared/section";
 import { getWorkflowRoles, getWorkflowScenes } from "@/lib/api";
 
@@ -10,6 +11,7 @@ export default async function WorkflowRolePage({ params }: { params: Promise<{ i
 
   const currentIndustry = industry ?? { name: "当前行业", slug: industrySlug, description: "", count: 0 };
   const currentRole = role ?? { name: "当前职位", slug: roleSlug, description: "", count: 0 };
+  const [createCard, ...sceneCards] = items;
 
   return (
     <PageShell>
@@ -20,7 +22,15 @@ export default async function WorkflowRolePage({ params }: { params: Promise<{ i
           extra={<SimpleBreadcrumb items={[{ label: '工作流', href: '/workflow' }, { label: currentIndustry.name, href: `/workflow/${currentIndustry.slug}` }, { label: currentRole.name }]} />}
         />
         <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {items.map((item) => (
+          {createCard ? (
+            <CtaCard
+              title={createCard.title}
+              description={createCard.description}
+              endpoint="/api/workflow/generate"
+              idleLabel="生成我的工作流"
+            />
+          ) : null}
+          {sceneCards.map((item) => (
             <GridCard key={item.slug} title={item.title} description={item.description} meta={item.status} />
           ))}
         </section>

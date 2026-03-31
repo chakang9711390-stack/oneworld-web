@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
+import { authCookieName, createSessionToken, getSessionCookieOptions, verifyPassword } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as { email?: string; password?: string };
@@ -11,16 +12,31 @@ export async function POST(request: NextRequest) {
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
+  if (!user || !user.passwordHash) {
     return NextResponse.json({ error: "该账号不存在，请先注册。" }, { status: 404 });
   }
 
-  if (user.passwordHash !== `demo:${password}`) {
+  const passwordMatched = await verifyPassword(password, user.passwordHash);
+  if (!passwordMatched) {
     return NextResponse.json({ error: "密码不正确。" }, { status: 401 });
   }
 
-  return NextResponse.json({
-    ok: true,
-    message: `登录成功，当前账号：${user.nickname ?? user.email}。`,
+  const token = await createSessionToken({
+    userId: user.id,
+    email: user.email,
+    nickname: user.nickname,
   });
+
+  const response = NextResponse.json({
+    ok: true,
+    message: `登录成功，欢迎回来，${user.nickname ?? user.email}。`,
+    user: {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+    },
+  });
+
+  response.cookies.set(authCookieName, token, getSessionCookieOptions());
+  return response;
 }

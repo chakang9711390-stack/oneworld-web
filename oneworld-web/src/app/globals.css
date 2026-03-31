@@ -102,3 +102,14 @@ input {
 .muted {
   color: var(--text-soft);
 }
+
+.auth-modal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+}
+
+@media (max-width: 960px) {
+  .auth-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,16 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
+import { authCookieName, verifySessionToken } from "@/lib/auth";
 
-export async function GET() {
-  const user = await prisma.user.findFirst();
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get(authCookieName)?.value;
 
-  return NextResponse.json(
-    user
-      ? {
-          id: user.id,
-          email: user.email,
-          nickname: user.nickname,
-        }
-      : null,
-  );
+  if (!token) {
+    return NextResponse.json(null);
+  }
+
+  try {
+    const payload = await verifySessionToken(token);
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+
+    if (!user) {
+      return NextResponse.json(null);
+    }
+
+    return NextResponse.json({
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      authProvider: user.authProvider,
+    });
+  } catch {
+    return NextResponse.json(null);
+  }
 }

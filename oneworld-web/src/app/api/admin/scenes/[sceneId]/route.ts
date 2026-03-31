@@ -1,6 +1,7 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
-import { SceneAutomationLevel, ScenePriorityLevel, SceneRiskLevel } from "@prisma/client";
+import { CommonStatus, SceneAutomationLevel, ScenePriorityLevel, SceneRiskLevel } from "@prisma/client";
 
 function pickEnumValue<T extends Record<string, string>>(enumObject: T, value?: string | null) {
   if (!value) return undefined;
@@ -40,6 +41,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ sc
         automationLevel: pickEnumValue(SceneAutomationLevel, body.automationLevel) ?? scene.automationLevel,
         riskLevel: pickEnumValue(SceneRiskLevel, body.riskLevel) ?? scene.riskLevel,
         launchPriority: pickEnumValue(ScenePriorityLevel, body.launchPriority) ?? scene.launchPriority,
+        directPurchase: typeof body.directPurchase === "boolean" ? body.directPurchase : scene.directPurchase,
+        customizationRequired:
+          typeof body.customizationRequired === "boolean" ? body.customizationRequired : scene.customizationRequired,
+        status: pickEnumValue(CommonStatus, body.status) ?? scene.status,
         displayTitle: body.name ?? scene.displayTitle ?? scene.name,
       },
     });
@@ -74,6 +79,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ sc
 
     return sceneDefinition;
   });
+
+  revalidatePath("/admin/scenes");
+  revalidatePath(`/admin/scenes/${sceneId}`);
+  revalidatePath(`/admin/scenes/${sceneId}/edit`);
+  revalidatePath("/scenes");
+  revalidatePath(`/scenes/${sceneId}`);
 
   return NextResponse.json({ ok: true, item: updated });
 }

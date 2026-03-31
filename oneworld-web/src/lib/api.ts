@@ -269,13 +269,13 @@ export async function getScenes() {
         orderBy: [{ launchPriority: "asc" }, { createdAt: "asc" }],
         include: {
           industry: {
-            select: { name: true, slug: true },
+            select: { id: true, name: true, slug: true },
           },
           role: {
-            select: { name: true, slug: true },
+            select: { id: true, name: true, slug: true },
           },
           workflowTemplate: {
-            select: { name: true, slug: true },
+            select: { id: true, name: true, slug: true },
           },
         },
       });
@@ -288,6 +288,13 @@ export async function getScenes() {
           description: item.shortDescription ?? "",
           meta: `${item.industry.name}｜${item.role.name}｜${item.launchPriority ?? "P1"}`,
           href: `/scenes/${item.sceneId}`,
+          industry: item.industry,
+          role: item.role,
+          workflow: item.workflowTemplate,
+          launchPriority: item.launchPriority,
+          riskLevel: item.riskLevel,
+          automationLevel: item.automationLevel,
+          status: item.status,
         })),
       };
     },

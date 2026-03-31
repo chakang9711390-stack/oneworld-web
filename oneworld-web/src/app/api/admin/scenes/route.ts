@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { CommonStatus, SceneAutomationLevel, SceneFrequencyLevel, ScenePriorityLevel, SceneRiskLevel, SceneSourceType } from "@prisma/client";
@@ -94,6 +95,9 @@ export async function POST(request: Request) {
 
     return scene;
   });
+
+  revalidatePath("/admin/scenes");
+  revalidatePath("/scenes");
 
   return NextResponse.json({ ok: true, item: created });
 }

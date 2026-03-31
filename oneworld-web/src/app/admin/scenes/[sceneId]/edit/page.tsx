@@ -13,7 +13,7 @@ export default async function AdminSceneEditPage({ params }: { params: Promise<{
     <div className="grid gap-6">
       <SectionCard
         title={`编辑场景｜${scene.name}`}
-        description="当前已接入真实保存接口，可直接修改核心字段。"
+        description="当前已接入真实保存接口，可直接修改核心字段，并管理状态与商业化开关。"
         extra={
           <SimpleBreadcrumb
             items={[
@@ -41,6 +41,9 @@ export default async function AdminSceneEditPage({ params }: { params: Promise<{
           automationLevel: scene.automationLevel,
           riskLevel: scene.riskLevel,
           launchPriority: scene.launchPriority,
+          status: scene.latestVersion?.maturityLevel === "archived" ? "archived" : "active",
+          directPurchase: scene.directPurchase,
+          customizationRequired: scene.customizationRequired,
           toolchainList: scene.executionConfig?.toolchainList ?? "",
           authRequiredList: scene.authConfig?.authRequiredList ?? "",
           humanConfirmationPoints: scene.riskRule?.humanConfirmationPoints ?? "",

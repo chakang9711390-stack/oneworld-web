@@ -18,6 +18,9 @@ type SceneEditPageProps = {
     automationLevel: string | null;
     riskLevel: string | null;
     launchPriority: string | null;
+    status?: string | null;
+    directPurchase?: boolean;
+    customizationRequired?: boolean;
     toolchainList: string;
     authRequiredList: string;
     humanConfirmationPoints: string;
@@ -35,6 +38,28 @@ function InputField({ label, value, onChange, disabled = false }: { label: strin
         onChange={(event) => onChange(event.target.value)}
         className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-sm text-[var(--text)] disabled:opacity-60"
       />
+    </label>
+  );
+}
+
+function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[] }) {
+  return (
+    <label className="grid gap-2 text-sm text-[var(--text-soft)]">
+      <span>{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-sm text-[var(--text)]">
+        {options.map((option) => (
+          <option key={option} value={option}>{option}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function CheckboxField({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-3 rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-sm text-[var(--text)]">
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} />
+      <span>{label}</span>
     </label>
   );
 }
@@ -57,7 +82,12 @@ export function AdminSceneEditForm({ scene }: SceneEditPageProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [form, setForm] = useState(scene);
+  const [form, setForm] = useState({
+    ...scene,
+    status: scene.status || "active",
+    directPurchase: scene.directPurchase || false,
+    customizationRequired: scene.customizationRequired || false,
+  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -80,6 +110,9 @@ export function AdminSceneEditForm({ scene }: SceneEditPageProps) {
         automationLevel: form.automationLevel,
         riskLevel: form.riskLevel,
         launchPriority: form.launchPriority,
+        status: form.status,
+        directPurchase: form.directPurchase,
+        customizationRequired: form.customizationRequired,
         toolchainList: form.toolchainList,
         authRequiredList: form.authRequiredList,
         humanConfirmationPoints: form.humanConfirmationPoints,
@@ -112,14 +145,20 @@ export function AdminSceneEditForm({ scene }: SceneEditPageProps) {
           <TextAreaField label="输出结果" value={form.outputResult} onChange={(value) => setForm((prev) => ({ ...prev, outputResult: value }))} />
           <InputField label="触发方式" value={form.triggerType} onChange={(value) => setForm((prev) => ({ ...prev, triggerType: value }))} />
           <InputField label="执行节奏" value={form.cadence} onChange={(value) => setForm((prev) => ({ ...prev, cadence: value }))} />
-          <InputField label="自动化等级" value={form.automationLevel || ""} onChange={(value) => setForm((prev) => ({ ...prev, automationLevel: value }))} />
-          <InputField label="风险等级" value={form.riskLevel || ""} onChange={(value) => setForm((prev) => ({ ...prev, riskLevel: value }))} />
-          <InputField label="上线优先级" value={form.launchPriority || ""} onChange={(value) => setForm((prev) => ({ ...prev, launchPriority: value }))} />
+          <SelectField label="自动化等级" value={form.automationLevel || "A3"} onChange={(value) => setForm((prev) => ({ ...prev, automationLevel: value }))} options={["A1", "A2", "A3"]} />
+          <SelectField label="风险等级" value={form.riskLevel || "R1"} onChange={(value) => setForm((prev) => ({ ...prev, riskLevel: value }))} options={["R1", "R2", "R3"]} />
+          <SelectField label="上线优先级" value={form.launchPriority || "P1"} onChange={(value) => setForm((prev) => ({ ...prev, launchPriority: value }))} options={["P0", "P1", "P2"]} />
+          <SelectField label="状态" value={form.status || "active"} onChange={(value) => setForm((prev) => ({ ...prev, status: value }))} options={["active", "disabled", "archived"]} />
           <TextAreaField label="工具链" value={form.toolchainList} onChange={(value) => setForm((prev) => ({ ...prev, toolchainList: value }))} />
           <TextAreaField label="授权要求" value={form.authRequiredList} onChange={(value) => setForm((prev) => ({ ...prev, authRequiredList: value }))} />
           <TextAreaField label="人工确认点" value={form.humanConfirmationPoints} onChange={(value) => setForm((prev) => ({ ...prev, humanConfirmationPoints: value }))} />
           <TextAreaField label="异常规则" value={form.exceptionRules} onChange={(value) => setForm((prev) => ({ ...prev, exceptionRules: value }))} />
         </div>
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <CheckboxField label="支持直接购买" checked={form.directPurchase} onChange={(value) => setForm((prev) => ({ ...prev, directPurchase: value }))} />
+        <CheckboxField label="仅支持定制化" checked={form.customizationRequired} onChange={(value) => setForm((prev) => ({ ...prev, customizationRequired: value }))} />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

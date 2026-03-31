@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "oneworld-theme";
 
@@ -18,22 +18,31 @@ function applyTheme(theme: ThemeMode) {
   root.style.colorScheme = theme;
 }
 
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) {
+      callback();
+    }
+  };
+
+  window.addEventListener("storage", handleStorage);
+  return () => window.removeEventListener("storage", handleStorage);
+}
+
 export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<ThemeMode>("dark");
+  const theme = useSyncExternalStore<ThemeMode>(subscribe, readStoredTheme, () => "dark");
 
   useEffect(() => {
-    const nextTheme = readStoredTheme();
-    setTheme(nextTheme);
-    applyTheme(nextTheme);
-    setMounted(true);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   function handleToggle() {
     const nextTheme: ThemeMode = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    applyTheme(nextTheme);
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
+    applyTheme(nextTheme);
+    window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY, newValue: nextTheme }));
   }
 
   return (
@@ -41,10 +50,10 @@ export function ThemeToggle() {
       type="button"
       onClick={handleToggle}
       className="rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text)] transition hover:border-[var(--line-strong)] hover:bg-[var(--panel)]"
-      aria-label={mounted ? `切换到${theme === "dark" ? "亮色" : "暗色"}模式` : "切换主题"}
+      aria-label={`切换到${theme === "dark" ? "亮色" : "暗色"}模式`}
       suppressHydrationWarning
     >
-      <span suppressHydrationWarning>{mounted ? (theme === "dark" ? "亮色" : "暗色") : "主题"}</span>
+      <span suppressHydrationWarning>{theme === "dark" ? "亮色" : "暗色"}</span>
     </button>
   );
 }

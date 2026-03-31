@@ -7,6 +7,7 @@ const links = [
   { href: "/opc", label: "OPC" },
   { href: "/workflow", label: "工作流" },
   { href: "/scenes", label: "场景 AGENT" },
+  { href: "/admin/scenes", label: "后台" },
   { href: "/workspace", label: "我的工作台" },
 ] as const;
 

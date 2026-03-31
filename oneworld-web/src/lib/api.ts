@@ -1,24 +1,5 @@
-import { headers } from "next/headers";
-
-async function resolveBaseUrl() {
-  if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL;
-  }
-
-  const headerStore = await headers();
-  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
-  const proto = headerStore.get("x-forwarded-proto") ?? "http";
-
-  if (!host) {
-    return "http://127.0.0.1:3000";
-  }
-
-  return `${proto}://${host}`;
-}
-
 async function request<T>(path: string): Promise<T> {
-  const baseUrl = await resolveBaseUrl();
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await fetch(path, {
     cache: "no-store",
   });
 

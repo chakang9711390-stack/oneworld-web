@@ -60,14 +60,14 @@ export function AuthDialog({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={mode === "register" ? "rounded-full bg-white px-4 py-2 text-sm font-semibold text-black" : "rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[var(--text)]"}
+        className={mode === "register" ? "rounded-full bg-[var(--button-primary-bg)] px-4 py-2 text-sm font-semibold text-[var(--button-primary-text)]" : "rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text)]"}
       >
         {triggerLabel}
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 px-4 backdrop-blur-sm">
-          <div className="shell-card w-full max-w-md rounded-[30px] p-6 shadow-[0_24px_80px_rgba(0,0,0,.26)]">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/56 px-4 backdrop-blur-md">
+          <div className="shell-card w-full max-w-md rounded-[30px] border border-[var(--line-strong)] bg-[var(--background-2)] p-6 shadow-[0_24px_80px_rgba(0,0,0,.26)]">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-semibold tracking-[-0.03em]">{mode === "login" ? "登录" : "注册"}</h2>
@@ -75,7 +75,7 @@ export function AuthDialog({
                   {mode === "login" ? "先用演示登录流程打通交互，再接真实鉴权。" : "先用演示注册流程恢复可用性，再继续接后端能力。"}
                 </p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className="text-sm text-[var(--text-soft)]">
+              <button type="button" onClick={() => setOpen(false)} className="rounded-full border border-[var(--line)] px-3 py-1.5 text-sm text-[var(--text-soft)] transition hover:bg-[var(--panel-soft)] hover:text-[var(--text)]">
                 关闭
               </button>
             </div>
@@ -87,7 +87,7 @@ export function AuthDialog({
                   <input
                     value={nickname}
                     onChange={(event) => setNickname(event.target.value)}
-                    className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3"
+                    className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-[var(--text)] placeholder:text-[var(--text-soft)]"
                     placeholder="输入昵称"
                   />
                 </label>
@@ -99,7 +99,7 @@ export function AuthDialog({
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3"
+                  className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-[var(--text)] placeholder:text-[var(--text-soft)]"
                   placeholder="name@example.com"
                   required
                 />
@@ -111,7 +111,7 @@ export function AuthDialog({
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3"
+                  className="rounded-[16px] border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-3 text-[var(--text)] placeholder:text-[var(--text-soft)]"
                   placeholder="至少 6 位"
                   required
                 />
@@ -122,7 +122,7 @@ export function AuthDialog({
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-full bg-[var(--button-primary-bg)] px-5 py-3 text-sm font-semibold text-[var(--button-primary-text)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "提交中..." : mode === "login" ? "立即登录" : "立即注册"}
               </button>

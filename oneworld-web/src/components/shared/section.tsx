@@ -29,7 +29,7 @@ export function SectionCard({ title, description, extra }: { title: string; desc
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-[-0.03em]">{title}</h2>
-          {description ? <p className="mt-2 max-w-3xl text-sm leading-7 text-white/60">{description}</p> : null}
+          {description ? <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--text-soft)]">{description}</p> : null}
         </div>
         {extra}
       </div>
@@ -39,12 +39,12 @@ export function SectionCard({ title, description, extra }: { title: string; desc
 
 export function GridCard({ title, description, meta, href }: { title: string; description: string; meta: string; href?: string }) {
   const content = (
-    <div className="shell-card flex min-h-[220px] flex-col justify-between rounded-[26px] p-6 transition hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_24px_80px_rgba(0,0,0,.42)]">
+    <div className="shell-card flex min-h-[220px] flex-col justify-between rounded-[26px] p-6 transition hover:-translate-y-1 hover:border-[var(--line-strong)] hover:shadow-[0_24px_80px_rgba(0,0,0,.24)]">
       <div>
         <h3 className="text-2xl font-semibold tracking-[-0.03em]">{title}</h3>
-        <p className="mt-3 text-sm leading-7 text-white/60">{description}</p>
+        <p className="mt-3 text-sm leading-7 text-[var(--text-soft)]">{description}</p>
       </div>
-      <div className="mt-6 flex items-center justify-between text-sm text-white/70">
+      <div className="mt-6 flex items-center justify-between text-sm text-[var(--text-soft)]">
         <span>{meta}</span>
         <span>进入 →</span>
       </div>

@@ -12,13 +12,13 @@ const links = [
 export function TopNav() {
   return (
     <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[color:color-mix(in_srgb,var(--background)_72%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[220px_1fr_320px] lg:items-center">
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:items-center">
         <div className="flex items-center gap-3 text-lg font-semibold">
           <div className="grid h-10 w-10 place-items-center rounded-2xl border border-[var(--line)] bg-[var(--panel-soft)]">一</div>
           <span>一世界</span>
         </div>
 
-        <nav className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-soft)]">
+        <nav className="flex flex-wrap items-center justify-center gap-3 text-sm text-[var(--text-soft)] lg:px-8">
           {links.map((item) => (
             <Link
               key={item.href}

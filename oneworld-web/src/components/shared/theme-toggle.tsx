@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "oneworld-theme";
 
 type ThemeMode = "light" | "dark";
+
+function getPreferredTheme(): ThemeMode {
+  if (typeof window === "undefined") return "dark";
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  return saved === "light" || saved === "dark" ? saved : "dark";
+}
 
 function applyTheme(theme: ThemeMode) {
   const root = document.documentElement;
@@ -13,21 +19,16 @@ function applyTheme(theme: ThemeMode) {
 }
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<ThemeMode>("dark");
-  const [mounted, setMounted] = useState(false);
+  const initialTheme = useMemo(() => getPreferredTheme(), []);
+  const [theme, setTheme] = useState<ThemeMode>(initialTheme);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
-    const nextTheme = saved === "light" || saved === "dark" ? saved : "dark";
-    applyTheme(nextTheme);
-    setTheme(nextTheme);
-    setMounted(true);
-  }, []);
+    applyTheme(theme);
+  }, [theme]);
 
   function handleToggle() {
     const nextTheme: ThemeMode = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
-    applyTheme(nextTheme);
     window.localStorage.setItem(STORAGE_KEY, nextTheme);
   }
 
@@ -35,10 +36,10 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={handleToggle}
-      className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-[var(--text)] transition hover:border-white/20 hover:bg-white/10"
-      aria-label={mounted ? `切换到${theme === "dark" ? "亮色" : "暗色"}模式` : "切换主题"}
+      className="rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text)] transition hover:border-[var(--line-strong)] hover:bg-[var(--panel)]"
+      aria-label={`切换到${theme === "dark" ? "亮色" : "暗色"}模式`}
     >
-      {mounted ? (theme === "dark" ? "亮色" : "暗色") : "主题"}
+      {theme === "dark" ? "亮色" : "暗色"}
     </button>
   );
 }

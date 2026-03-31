@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --background: #060606;
   --background-2: #0b0b0c;
   --background-3: #101012;
@@ -24,16 +25,17 @@
 }
 
 :root[data-theme="light"] {
+  color-scheme: light;
   --background: #f7f5ef;
   --background-2: #f1ede4;
   --background-3: #ebe5da;
-  --panel: rgba(255, 255, 255, 0.72);
-  --panel-soft: rgba(255, 255, 255, 0.92);
+  --panel: rgba(255, 255, 255, 0.78);
+  --panel-soft: rgba(255, 255, 255, 0.96);
   --line: rgba(17, 17, 17, 0.08);
   --line-strong: rgba(17, 17, 17, 0.16);
-  --text: rgba(17, 17, 17, 0.92);
-  --text-soft: rgba(17, 17, 17, 0.64);
-  --text-faint: rgba(17, 17, 17, 0.34);
+  --text: rgba(17, 17, 17, 0.94);
+  --text-soft: rgba(17, 17, 17, 0.72);
+  --text-faint: rgba(17, 17, 17, 0.48);
   --primary: #111111;
   --primary-2: #2c2c2c;
   --button-primary-bg: #111111;

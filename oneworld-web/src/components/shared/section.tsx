@@ -15,7 +15,7 @@ export function Hero() {
         <div className="flex min-h-14 items-center rounded-[20px] border border-[var(--line)] bg-[var(--panel-soft)] px-5 text-sm text-[var(--text-soft)]">
           我想找到适合自己的 OPC，或者直接进入产品工作流
         </div>
-        <Link href="/opc" className="inline-flex items-center justify-center rounded-full bg-[var(--button-primary-bg)] px-6 py-3 text-sm font-semibold text-[var(--button-primary-text)] transition hover:opacity-92">
+        <Link href="/opc" className="hero-cta inline-flex min-w-[128px] items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition hover:opacity-92">
           开始探索
         </Link>
       </div>

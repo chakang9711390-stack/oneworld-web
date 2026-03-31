@@ -103,6 +103,17 @@ input {
   color: var(--text-soft);
 }
 
+.hero-cta {
+  background: var(--button-primary-bg);
+  color: var(--button-primary-text);
+  border: 1px solid color-mix(in srgb, var(--button-primary-bg) 84%, transparent);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--button-primary-bg) 18%, transparent);
+}
+
+.hero-cta:hover {
+  color: var(--button-primary-text);
+}
+
 .auth-modal-grid {
   display: grid;
   grid-template-columns: minmax(0, 420px) minmax(0, 1fr);

@@ -1,6 +1,7 @@
 export const homeEntryCards = [
   { title: "OPC 方案库", href: "/opc", description: "进入行业库与 OPC 项目卡片库。" },
   { title: "工作流库", href: "/workflow", description: "进入行业、职位与工作场景库。" },
+  { title: "场景 AGENT 库", href: "/scenes", description: "直接浏览首批标准场景 AGENT 资产。" },
   { title: "我的工作台", href: "/workspace", description: "查看项目、OPC 与工作流状态。" },
 ] as const;
 

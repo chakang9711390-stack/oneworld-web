@@ -258,3 +258,95 @@ export async function getWorkflowScenes(roleSlug: string) {
 export async function getWorkspaceOverview() {
   return getCachedWorkspaceOverview();
 }
+
+export async function getScenes() {
+  const getCachedScenes = unstable_cache(
+    async () => {
+      const items = await prisma.sceneDefinition.findMany({
+        where: {
+          status: "active",
+        },
+        orderBy: [{ launchPriority: "asc" }, { createdAt: "asc" }],
+        include: {
+          industry: {
+            select: { name: true, slug: true },
+          },
+          role: {
+            select: { name: true, slug: true },
+          },
+          workflowTemplate: {
+            select: { name: true, slug: true },
+          },
+        },
+      });
+
+      return {
+        items: items.map((item) => ({
+          sceneId: item.sceneId,
+          name: item.name,
+          slug: item.slug,
+          description: item.shortDescription ?? "",
+          meta: `${item.industry.name}｜${item.role.name}｜${item.launchPriority ?? "P1"}`,
+          href: `/scenes/${item.sceneId}`,
+        })),
+      };
+    },
+    ["scene-list"],
+    { revalidate: 120 },
+  );
+
+  return getCachedScenes();
+}
+
+export async function getSceneDetail(sceneId: string) {
+  const getCachedSceneDetail = unstable_cache(
+    async () => {
+      const item = await prisma.sceneDefinition.findUnique({
+        where: { sceneId },
+        include: {
+          industry: true,
+          role: true,
+          workflowTemplate: true,
+          executionConfig: true,
+          authConfig: true,
+          riskRule: true,
+          versions: {
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      });
+
+      if (!item) return null;
+
+      return {
+        sceneId: item.sceneId,
+        name: item.name,
+        description: item.shortDescription ?? "",
+        marketingSummary: item.marketingSummary ?? item.shortDescription ?? "",
+        businessGoal: item.businessGoal ?? "",
+        painPoint: item.painPoint ?? "",
+        inputMaterials: item.inputMaterials ?? "",
+        outputResult: item.outputResult ?? "",
+        triggerType: item.triggerType ?? "",
+        cadence: item.cadence ?? "",
+        automationLevel: item.automationLevel ?? null,
+        riskLevel: item.riskLevel ?? null,
+        frequencyLevel: item.frequencyLevel ?? null,
+        launchPriority: item.launchPriority ?? null,
+        directPurchase: item.directPurchase,
+        customizationRequired: item.customizationRequired,
+        industry: item.industry,
+        role: item.role,
+        workflow: item.workflowTemplate,
+        executionConfig: item.executionConfig,
+        authConfig: item.authConfig,
+        riskRule: item.riskRule,
+        latestVersion: item.versions[0] ?? null,
+      };
+    },
+    ["scene-detail", sceneId],
+    { revalidate: 120 },
+  );
+
+  return getCachedSceneDetail();
+}

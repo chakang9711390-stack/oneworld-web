@@ -31,6 +31,35 @@ enum WorkspaceProjectStatus {
   archived
 }
 
+enum SceneAutomationLevel {
+  A1
+  A2
+  A3
+}
+
+enum SceneRiskLevel {
+  R1
+  R2
+  R3
+}
+
+enum SceneFrequencyLevel {
+  S
+  A
+  B
+}
+
+enum ScenePriorityLevel {
+  P0
+  P1
+  P2
+}
+
+enum SceneSourceType {
+  standard
+  custom
+}
+
 model User {
   id                String             @id @default(cuid())
   email             String             @unique
@@ -44,17 +73,27 @@ model User {
 }
 
 model Industry {
-  id                  String               @id @default(cuid())
-  name                String
-  slug                String               @unique
-  type                IndustryType
-  description         String?
-  sortOrder           Int                  @default(0)
-  status              CommonStatus         @default(active)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  opcProjectTemplates OpcProjectTemplate[]
-  workflowRoles       WorkflowRole[]
+  id                    String               @id @default(cuid())
+  name                  String
+  slug                  String               @unique
+  type                  IndustryType
+  description           String?
+  sortOrder             Int                  @default(0)
+  status                CommonStatus         @default(active)
+  businessGoals         String?
+  commonOrgStructure    String?
+  commonMetrics         String?
+  commonTools           String?
+  glossary              String?
+  riskNotes             String?
+  complianceNotes       String?
+  maturityLevel         String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  opcProjectTemplates   OpcProjectTemplate[]
+  workflowRoles         WorkflowRole[]
+  workflowTemplates     WorkflowTemplate[]
+  sceneDefinitions      SceneDefinition[]
 }
 
 model OpcProjectTemplate {
@@ -72,17 +111,20 @@ model OpcProjectTemplate {
 }
 
 model WorkflowRole {
-  id             String          @id @default(cuid())
-  industryId     String
-  name           String
-  slug           String          @unique
-  description    String?
-  sortOrder      Int             @default(0)
-  status         CommonStatus    @default(active)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  industry       Industry        @relation(fields: [industryId], references: [id], onDelete: Cascade)
-  workflowScenes WorkflowScene[]
+  id                  String             @id @default(cuid())
+  industryId          String
+  name                String
+  slug                String             @unique
+  description         String?
+  responsibility      String?
+  sortOrder           Int                @default(0)
+  status              CommonStatus       @default(active)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  industry            Industry           @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  workflowScenes      WorkflowScene[]
+  workflowTemplates   WorkflowTemplate[]
+  sceneDefinitions    SceneDefinition[]
 }
 
 model WorkflowScene {
@@ -97,6 +139,125 @@ model WorkflowScene {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   role            WorkflowRole    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model WorkflowTemplate {
+  id                String            @id @default(cuid())
+  industryId        String
+  roleId            String
+  code              String            @unique
+  name              String
+  slug              String            @unique
+  description       String?
+  businessGoal      String?
+  cadence           String?
+  sortOrder         Int               @default(0)
+  status            CommonStatus      @default(active)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  industry          Industry          @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  role              WorkflowRole      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  sceneDefinitions  SceneDefinition[]
+}
+
+model SceneDefinition {
+  id                    String                @id @default(cuid())
+  sceneId               String                @unique
+  name                  String
+  slug                  String                @unique
+  shortDescription      String?
+  detailedDescription   String?
+  businessGoal          String?
+  painPoint             String?
+  inputMaterials        String?
+  outputResult          String?
+  triggerType           String?
+  cadence               String?
+  automationLevel       SceneAutomationLevel?
+  riskLevel             SceneRiskLevel?
+  frequencyLevel        SceneFrequencyLevel?
+  reusableLevel         String?
+  commercialValue       String?
+  launchPriority        ScenePriorityLevel?
+  status                CommonStatus          @default(active)
+  displayTitle          String?
+  displaySubtitle       String?
+  marketingSummary      String?
+  directPurchase        Boolean               @default(false)
+  customizationRequired Boolean               @default(false)
+  industryId            String
+  roleId                String
+  workflowTemplateId    String
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  industry              Industry              @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  role                  WorkflowRole          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  workflowTemplate      WorkflowTemplate      @relation(fields: [workflowTemplateId], references: [id], onDelete: Cascade)
+  executionConfig       SceneExecutionConfig?
+  authConfig            SceneAuthConfig?
+  riskRule              SceneRiskRule?
+  versions              SceneVersion[]
+}
+
+model SceneExecutionConfig {
+  id                      String          @id @default(cuid())
+  sceneDefinitionId       String          @unique
+  toolchainList           String?
+  dependencyServices      String?
+  environmentRequirements String?
+  modelRequirements       String?
+  preloadedKnowledge      String?
+  executionStepsSummary   String?
+  promptStrategyRef       String?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  sceneDefinition         SceneDefinition @relation(fields: [sceneDefinitionId], references: [id], onDelete: Cascade)
+}
+
+model SceneAuthConfig {
+  id                           String          @id @default(cuid())
+  sceneDefinitionId            String          @unique
+  authRequiredList             String?
+  accountTypesRequired         String?
+  loginStateRequired           String?
+  fileAccessRequired           String?
+  externalPlatformAccessRequired String?
+  minimalPermissionScope       String?
+  sensitivePermissions         String?
+  authorizationNotes           String?
+  createdAt                    DateTime        @default(now())
+  updatedAt                    DateTime        @updatedAt
+  sceneDefinition              SceneDefinition @relation(fields: [sceneDefinitionId], references: [id], onDelete: Cascade)
+}
+
+model SceneRiskRule {
+  id                       String          @id @default(cuid())
+  sceneDefinitionId        String          @unique
+  humanConfirmationPoints  String?
+  forbiddenActions         String?
+  exceptionRules           String?
+  rollbackSupported        Boolean         @default(false)
+  rollbackNotes            String?
+  alertingRequired         Boolean         @default(false)
+  alertingChannels         String?
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+  sceneDefinition          SceneDefinition @relation(fields: [sceneDefinitionId], references: [id], onDelete: Cascade)
+}
+
+model SceneVersion {
+  id                      String          @id @default(cuid())
+  sceneDefinitionId       String
+  version                 String
+  sourceType              SceneSourceType?
+  maturityLevel           String?
+  validatedCustomersCount Int             @default(0)
+  owner                   String?
+  releaseNotes            String?
+  createdAt               DateTime        @default(now())
+  sceneDefinition         SceneDefinition @relation(fields: [sceneDefinitionId], references: [id], onDelete: Cascade)
+
+  @@unique([sceneDefinitionId, version])
 }
 
 model WorkspaceProject {

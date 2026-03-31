@@ -26,12 +26,12 @@ export function Hero() {
 export function SectionCard({ title, description, extra }: { title: string; description?: string; extra?: ReactNode }) {
   return (
     <section className="shell-card rounded-[26px] p-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="grid gap-4">
+        {extra ? <div>{extra}</div> : null}
         <div>
           <h2 className="text-2xl font-semibold tracking-[-0.03em]">{title}</h2>
           {description ? <p className="mt-2 max-w-3xl text-sm leading-7 text-[var(--text-soft)]">{description}</p> : null}
         </div>
-        {extra}
       </div>
     </section>
   );
@@ -56,13 +56,21 @@ export function GridCard({ title, description, meta, href }: { title: string; de
 
 export function SimpleBreadcrumb({ items }: { items: { label: string; href?: string }[] }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 text-sm text-white/60">
+    <nav aria-label="面包屑导航" className="flex flex-wrap items-center gap-2 text-sm text-[var(--text-soft)]">
       {items.map((item, index) => (
         <div key={`${item.label}-${index}`} className="flex items-center gap-2">
-          {item.href ? <Link href={item.href}>{item.label}</Link> : <span>{item.label}</span>}
-          {index < items.length - 1 ? <span>/</span> : null}
+          {item.href ? (
+            <Link href={item.href} className="rounded-full border border-transparent px-3 py-1.5 transition hover:border-[var(--line)] hover:bg-[var(--panel-soft)] hover:text-[var(--text)]">
+              {item.label}
+            </Link>
+          ) : (
+            <span className="rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-3 py-1.5 text-[var(--text)]">
+              {item.label}
+            </span>
+          )}
+          {index < items.length - 1 ? <span className="text-[var(--text-faint)]">/</span> : null}
         </div>
       ))}
-    </div>
+    </nav>
   );
 }

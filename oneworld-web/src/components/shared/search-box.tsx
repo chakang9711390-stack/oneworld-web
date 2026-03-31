@@ -42,7 +42,7 @@ export function SearchBox({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="search-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {filteredItems.map((item) => {
           const card = (
             <div className="shell-card flex min-h-[220px] flex-col justify-between rounded-[26px] p-6 transition hover:-translate-y-1 hover:border-white/20 hover:shadow-[0_24px_80px_rgba(0,0,0,.16)]">

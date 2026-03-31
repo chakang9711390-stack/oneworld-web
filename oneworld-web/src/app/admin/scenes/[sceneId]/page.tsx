@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SectionCard, SimpleBreadcrumb } from "@/components/shared/section";
 import { getSceneDetail } from "@/lib/api";
+import { AdminSceneActions } from "./actions";
 
 function AdminField({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -48,6 +49,8 @@ export default async function AdminSceneDetailPage({ params }: { params: Promise
           前台查看
         </Link>
       </div>
+
+      <AdminSceneActions sceneId={scene.sceneId} />
 
       <section className="grid gap-5 xl:grid-cols-2">
         <div className="grid gap-5">

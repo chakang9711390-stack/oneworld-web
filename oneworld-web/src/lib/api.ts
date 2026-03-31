@@ -166,19 +166,16 @@ export async function getWorkflowRoles(industrySlug: string) {
               status: "active",
             },
             orderBy: { sortOrder: "asc" },
-            include: {
+            select: {
+              name: true,
+              slug: true,
+              description: true,
               workflowScenes: {
                 where: {
                   status: "active",
                 },
                 select: { id: true },
               },
-            },
-            select: {
-              name: true,
-              slug: true,
-              description: true,
-              workflowScenes: true,
             },
           },
         },

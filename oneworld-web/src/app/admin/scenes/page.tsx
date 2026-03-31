@@ -7,7 +7,16 @@ export default async function AdminScenesPage() {
 
   return (
     <div className="grid gap-6">
-      <SectionCard title="场景管理" description="当前场景 AGENT 资产的后台列表页，先支持查看和进入详情。" />
+      <SectionCard title="场景管理" description="当前场景 AGENT 资产的后台列表页，已支持查看、进入详情和创建新场景。" />
+
+      <div>
+        <Link
+          href="/admin/scenes/new"
+          className="inline-flex rounded-full border border-[var(--line)] px-4 py-2 text-sm text-[var(--text)] transition hover:bg-[var(--panel-soft)]"
+        >
+          新建场景
+        </Link>
+      </div>
 
       <div className="overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--panel)]">
         <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr_140px] gap-4 border-b border-[var(--line)] px-5 py-4 text-xs uppercase tracking-[0.08em] text-[var(--text-faint)]">

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SectionCard, SimpleBreadcrumb } from "@/components/shared/section";
 import { getSceneDetail } from "@/lib/api";
 import { AdminSceneActions } from "./actions";
+import { SceneVersionForm } from "./version-form";
 
 function AdminField({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -85,6 +86,19 @@ export default async function AdminSceneDetailPage({ params }: { params: Promise
           </div>
         </div>
       </section>
+
+      <div className="grid gap-5">
+        <SectionCard title="版本与成熟度管理" description="当前场景版本、来源、成熟度与验证状态的后台维护区。" />
+        <SceneVersionForm
+          sceneId={scene.sceneId}
+          version={scene.latestVersion?.version ?? "v1"}
+          sourceType={scene.latestVersion?.sourceType ?? "standard"}
+          maturityLevel={scene.latestVersion?.maturityLevel ?? "draft"}
+          validatedCustomersCount={scene.latestVersion?.validatedCustomersCount ?? 0}
+          owner={scene.latestVersion?.owner ?? ""}
+          releaseNotes={scene.latestVersion?.releaseNotes ?? ""}
+        />
+      </div>
     </div>
   );
 }

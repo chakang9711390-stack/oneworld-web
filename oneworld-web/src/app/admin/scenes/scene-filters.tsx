@@ -14,6 +14,9 @@ type SceneItem = {
   riskLevel: string | null;
   automationLevel: string | null;
   status: string;
+  directPurchase?: boolean;
+  customizationRequired?: boolean;
+  validatedCustomersCount?: number;
 };
 
 type Option = { id: string; name: string };
@@ -96,31 +99,38 @@ export function AdminSceneFilters({
       </div>
 
       <div className="overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--panel)]">
-        <div className="grid grid-cols-[1.5fr_1fr_1fr_110px_110px_140px] gap-4 border-b border-[var(--line)] px-5 py-4 text-xs uppercase tracking-[0.08em] text-[var(--text-faint)]">
+        <div className="grid grid-cols-[1.4fr_1fr_1fr_90px_90px_110px_110px_140px] gap-4 border-b border-[var(--line)] px-5 py-4 text-xs uppercase tracking-[0.08em] text-[var(--text-faint)]">
           <span>场景</span>
           <span>行业</span>
           <span>职业</span>
           <span>优先级</span>
           <span>风险</span>
+          <span>状态</span>
+          <span>售卖</span>
           <span>操作</span>
         </div>
-        {filtered.map((item) => (
-          <div key={item.sceneId} className="grid grid-cols-[1.5fr_1fr_1fr_110px_110px_140px] gap-4 border-b border-[var(--line)] px-5 py-4 text-sm last:border-b-0">
-            <div>
-              <div className="font-semibold text-[var(--text)]">{item.name}</div>
-              <div className="mt-1 text-[var(--text-soft)]">{item.description}</div>
+        {filtered.map((item) => {
+          const saleLabel = item.customizationRequired ? "定制化" : item.directPurchase ? "直购" : "未设";
+          return (
+            <div key={item.sceneId} className="grid grid-cols-[1.4fr_1fr_1fr_90px_90px_110px_110px_140px] gap-4 border-b border-[var(--line)] px-5 py-4 text-sm last:border-b-0">
+              <div>
+                <div className="font-semibold text-[var(--text)]">{item.name}</div>
+                <div className="mt-1 text-[var(--text-soft)]">{item.description}</div>
+              </div>
+              <div className="text-[var(--text-soft)]">{item.industry.name}</div>
+              <div className="text-[var(--text-soft)]">{item.role.name}</div>
+              <div className="text-[var(--text-soft)]">{item.launchPriority ?? "-"}</div>
+              <div className="text-[var(--text-soft)]">{item.riskLevel ?? "-"}</div>
+              <div className="text-[var(--text-soft)]">{item.status}</div>
+              <div className="text-[var(--text-soft)]">{saleLabel}</div>
+              <div>
+                <Link href={`/admin/scenes/${item.sceneId}`} className="inline-flex rounded-full border border-[var(--line)] px-4 py-2 text-sm text-[var(--text)] transition hover:bg-[var(--panel-soft)]">
+                  查看详情
+                </Link>
+              </div>
             </div>
-            <div className="text-[var(--text-soft)]">{item.industry.name}</div>
-            <div className="text-[var(--text-soft)]">{item.role.name}</div>
-            <div className="text-[var(--text-soft)]">{item.launchPriority ?? "-"}</div>
-            <div className="text-[var(--text-soft)]">{item.riskLevel ?? "-"}</div>
-            <div>
-              <Link href={`/admin/scenes/${item.sceneId}`} className="inline-flex rounded-full border border-[var(--line)] px-4 py-2 text-sm text-[var(--text)] transition hover:bg-[var(--panel-soft)]">
-                查看详情
-              </Link>
-            </div>
-          </div>
-        ))}
+          );
+        })}
         {filtered.length === 0 ? <div className="px-5 py-6 text-sm text-[var(--text-soft)]">没有找到符合条件的场景。</div> : null}
       </div>
     </div>

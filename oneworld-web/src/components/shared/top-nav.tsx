@@ -1,17 +1,22 @@
 import Link from "next/link";
 import { AuthDialog } from "@/components/shared/auth-dialog";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { getCurrentUser } from "@/lib/server/auth";
 
-const links = [
+const baseLinks = [
   { href: "/", label: "首页" },
   { href: "/opc", label: "OPC" },
   { href: "/workflow", label: "工作流" },
   { href: "/scenes", label: "场景 AGENT" },
-  { href: "/admin/scenes", label: "后台" },
   { href: "/workspace", label: "我的工作台" },
 ] as const;
 
-export function TopNav() {
+export async function TopNav() {
+  const user = await getCurrentUser();
+  const links = user?.isAdmin
+    ? [...baseLinks.slice(0, 4), { href: "/admin/scenes", label: "后台" }, baseLinks[4]]
+    : baseLinks;
+
   return (
     <header className="sticky top-0 z-20 border-b border-[var(--line)] bg-[color:color-mix(in_srgb,var(--background)_72%,transparent)] backdrop-blur-xl">
       <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-4 px-6 py-5 lg:grid-cols-[220px_minmax(0,1fr)_360px] lg:items-center">

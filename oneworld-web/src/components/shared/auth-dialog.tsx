@@ -13,6 +13,7 @@ type AuthResponse = {
     id: string;
     email: string;
     nickname?: string | null;
+    isAdmin?: boolean;
   };
 };
 
@@ -98,6 +99,7 @@ export function AuthDialog() {
       const data = await submitJson<AuthResponse>(url, payload);
       setNotice(data.message ?? (mode === "register" ? "注册成功" : "登录成功"));
       setNoticeType("success");
+      window.location.reload();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "提交失败");
       setNoticeType("error");

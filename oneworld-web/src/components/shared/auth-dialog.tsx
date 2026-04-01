@@ -1,20 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type PanelMode = "login" | "register";
 type Provider = "google" | "apple";
+
+type AuthUser = {
+  id: string;
+  email: string;
+  nickname?: string | null;
+  isAdmin?: boolean;
+};
 
 type AuthResponse = {
   ok?: boolean;
   error?: string;
   message?: string;
-  user?: {
-    id: string;
-    email: string;
-    nickname?: string | null;
-    isAdmin?: boolean;
-  };
+  user?: AuthUser;
 };
 
 const loginBenefits = ["继续你的项目工作台", "同步 OPC / 工作流 进度", "后续可无缝接入正式第三方登录"];
@@ -65,6 +67,34 @@ export function AuthDialog() {
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<string>("");
   const [noticeType, setNoticeType] = useState<"success" | "error" | "info">("info");
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [checkingUser, setCheckingUser] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch("/api/auth/me", { credentials: "include" });
+        const data = await response.json();
+        if (!mounted) return;
+        setCurrentUser(data || null);
+      } catch {
+        if (!mounted) return;
+        setCurrentUser(null);
+      } finally {
+        if (mounted) {
+          setCheckingUser(false);
+        }
+      }
+    }
+
+    loadCurrentUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const panelCopy = useMemo(
     () => ({
@@ -99,10 +129,26 @@ export function AuthDialog() {
       const data = await submitJson<AuthResponse>(url, payload);
       setNotice(data.message ?? (mode === "register" ? "注册成功" : "登录成功"));
       setNoticeType("success");
+      setCurrentUser(data.user ?? null);
+      setOpen(false);
       window.location.reload();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "提交失败");
       setNoticeType("error");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleLogout() {
+    setSubmitting(true);
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setCurrentUser(null);
+      window.location.reload();
     } finally {
       setSubmitting(false);
     }
@@ -125,6 +171,31 @@ export function AuthDialog() {
   }
 
   const currentPanel = panelCopy[mode];
+
+  if (checkingUser) {
+    return <div className="rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text-soft)]">加载中...</div>;
+  }
+
+  if (currentUser) {
+    return (
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text)]">
+          <span>{currentUser.nickname || currentUser.email}</span>
+          {currentUser.isAdmin ? (
+            <span className="rounded-full bg-[var(--button-primary-bg)] px-2 py-0.5 text-xs font-semibold text-[var(--button-primary-text)]">Admin</span>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={submitting}
+          className="rounded-full border border-[var(--line)] bg-[var(--panel-soft)] px-4 py-2 text-sm text-[var(--text)] transition hover:border-[var(--line-strong)] hover:bg-[var(--panel)] disabled:opacity-60"
+        >
+          {submitting ? "退出中..." : "退出"}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>

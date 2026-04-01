@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PageShell } from "@/components/shared/section";
+import { requireAdmin } from "@/lib/server/auth";
 
 const adminLinks = [
   { href: "/admin/scenes", label: "场景管理" },
@@ -9,7 +11,13 @@ const adminLinks = [
   { href: "/admin/workflows", label: "工作流管理" },
 ] as const;
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const admin = await requireAdmin();
+
+  if (!admin.ok) {
+    redirect("/");
+  }
+
   return (
     <PageShell>
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">

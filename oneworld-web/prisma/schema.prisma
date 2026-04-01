@@ -67,6 +67,7 @@ model User {
   nickname          String?
   avatarUrl         String?
   authProvider      AuthProvider       @default(email)
+  isAdmin           Boolean            @default(false)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
   workspaceProjects WorkspaceProject[]
@@ -128,17 +129,22 @@ model WorkflowRole {
 }
 
 model WorkflowScene {
-  id              String          @id @default(cuid())
-  roleId          String
-  title           String
-  slug            String          @unique
-  description     String?
-  isGenerateEntry Boolean         @default(false)
-  sortOrder       Int             @default(0)
-  status          CommonStatus    @default(active)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  role            WorkflowRole    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  id                String           @id @default(cuid())
+  roleId            String
+  title             String
+  slug              String           @unique
+  description       String?
+  isGenerateEntry   Boolean          @default(false)
+  sortOrder         Int              @default(0)
+  status            CommonStatus     @default(active)
+  sourceType        String?          @default("seed")
+  sceneDefinitionId String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  role              WorkflowRole     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  sceneDefinition   SceneDefinition? @relation(fields: [sceneDefinitionId], references: [id], onDelete: SetNull)
+
+  @@index([sceneDefinitionId])
 }
 
 model WorkflowTemplate {
@@ -197,6 +203,7 @@ model SceneDefinition {
   authConfig            SceneAuthConfig?
   riskRule              SceneRiskRule?
   versions              SceneVersion[]
+  workflowScenes        WorkflowScene[]
 }
 
 model SceneExecutionConfig {

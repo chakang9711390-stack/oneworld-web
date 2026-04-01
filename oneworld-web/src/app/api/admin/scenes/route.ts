@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { CommonStatus, SceneAutomationLevel, SceneFrequencyLevel, ScenePriorityLevel, SceneRiskLevel, SceneSourceType } from "@prisma/client";
+import { requireAdmin } from "@/lib/server/auth";
 
 function pickEnumValue<T extends Record<string, string>>(enumObject: T, value?: string | null, fallback?: T[keyof T]) {
   if (!value) return fallback;
@@ -18,6 +19,12 @@ function slugify(input: string) {
 }
 
 export async function POST(request: Request) {
+  const admin = await requireAdmin();
+
+  if (!admin.ok) {
+    return NextResponse.json({ message: admin.message }, { status: admin.status });
+  }
+
   const body = await request.json();
 
   if (!body.name || !body.industryId || !body.roleId || !body.workflowTemplateId) {
@@ -48,7 +55,7 @@ export async function POST(request: Request) {
         reusableLevel: body.reusableLevel || "medium",
         commercialValue: body.commercialValue || "medium",
         launchPriority: pickEnumValue(ScenePriorityLevel, body.launchPriority, ScenePriorityLevel.P1),
-        status: CommonStatus.active,
+        status: CommonStatus.disabled,
         displayTitle: body.name,
         displaySubtitle: body.displaySubtitle || "",
         directPurchase: false,

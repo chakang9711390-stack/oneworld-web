@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
       email: user.email,
       nickname: user.nickname,
       authProvider: user.authProvider,
+      isAdmin: user.isAdmin,
     });
   } catch {
     return NextResponse.json(null);

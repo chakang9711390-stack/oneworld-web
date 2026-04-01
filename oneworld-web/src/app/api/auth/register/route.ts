@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       id: user.id,
       email: user.email,
       nickname: user.nickname,
+      isAdmin: user.isAdmin,
     },
   });
 

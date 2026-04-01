@@ -10,6 +10,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ rol
       workflowScenes: {
         where: { status: "active" },
         orderBy: { sortOrder: "asc" },
+        include: {
+          sceneDefinition: {
+            select: {
+              sceneId: true,
+            },
+          },
+        },
       },
     },
   });
@@ -29,6 +36,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ rol
         slug: item.slug,
         description: item.description,
         status: item.isGenerateEntry ? "生成入口" : "场景卡片",
+        sceneId: item.sceneDefinition?.sceneId ?? null,
+        href: item.sceneDefinition?.sceneId ? `/scenes/${item.sceneDefinition.sceneId}` : null,
+        bound: Boolean(item.sceneDefinition?.sceneId),
       })) ?? [],
   });
 }

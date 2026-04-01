@@ -2,8 +2,15 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { SceneSourceType } from "@prisma/client";
+import { requireAdmin } from "@/lib/server/auth";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ sceneId: string }> }) {
+  const admin = await requireAdmin();
+
+  if (!admin.ok) {
+    return NextResponse.json({ message: admin.message }, { status: admin.status });
+  }
+
   const { sceneId } = await params;
   const body = await request.json();
 

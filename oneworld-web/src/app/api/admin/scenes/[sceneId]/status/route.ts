@@ -1,9 +1,16 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-import { prisma } from "@/server/prisma";
 import { CommonStatus } from "@prisma/client";
+import { requireAdmin } from "@/lib/server/auth";
+import { syncWorkflowSceneWithSceneStatus } from "@/server/scene-publishing";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ sceneId: string }> }) {
+  const admin = await requireAdmin();
+
+  if (!admin.ok) {
+    return NextResponse.json({ message: admin.message }, { status: admin.status });
+  }
+
   const { sceneId } = await params;
   const body = await request.json();
   const nextStatus = body.status as CommonStatus | undefined;
@@ -12,16 +19,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ sc
     return NextResponse.json({ message: "Invalid status" }, { status: 400 });
   }
 
-  const scene = await prisma.sceneDefinition.findUnique({ where: { sceneId } });
+  let updated;
 
-  if (!scene) {
-    return NextResponse.json({ message: "Scene not found" }, { status: 404 });
+  try {
+    updated = await syncWorkflowSceneWithSceneStatus(sceneId, nextStatus);
+  } catch (error) {
+    if (error instanceof Error && error.message === "SCENE_NOT_FOUND") {
+      return NextResponse.json({ message: "Scene not found" }, { status: 404 });
+    }
+
+    throw error;
   }
-
-  const updated = await prisma.sceneDefinition.update({
-    where: { id: scene.id },
-    data: { status: nextStatus },
-  });
 
   revalidatePath("/admin/scenes");
   revalidatePath(`/admin/scenes/${sceneId}`);

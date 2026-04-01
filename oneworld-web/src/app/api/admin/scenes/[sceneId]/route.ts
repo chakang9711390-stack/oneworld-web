@@ -2,6 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/prisma";
 import { CommonStatus, SceneAutomationLevel, ScenePriorityLevel, SceneRiskLevel } from "@prisma/client";
+import { requireAdmin } from "@/lib/server/auth";
 
 function pickEnumValue<T extends Record<string, string>>(enumObject: T, value?: string | null) {
   if (!value) return undefined;
@@ -9,6 +10,12 @@ function pickEnumValue<T extends Record<string, string>>(enumObject: T, value?: 
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ sceneId: string }> }) {
+  const admin = await requireAdmin();
+
+  if (!admin.ok) {
+    return NextResponse.json({ message: admin.message }, { status: admin.status });
+  }
+
   const { sceneId } = await params;
   const body = await request.json();
 

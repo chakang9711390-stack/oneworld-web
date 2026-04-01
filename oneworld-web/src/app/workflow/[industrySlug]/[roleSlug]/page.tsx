@@ -31,7 +31,7 @@ export default async function WorkflowRolePage({ params }: { params: Promise<{ i
             />
           ) : null}
           {sceneCards.map((item) => (
-            <GridCard key={item.slug} title={item.title} description={item.description} meta={item.status} />
+            <GridCard key={item.slug} title={item.title} description={item.description} meta={item.status} href={item.href} />
           ))}
         </section>
       </div>

@@ -225,6 +225,11 @@ export async function getWorkflowScenes(roleSlug: string) {
               slug: true,
               description: true,
               isGenerateEntry: true,
+              sceneDefinition: {
+                select: {
+                  sceneId: true,
+                },
+              },
             },
           },
         },
@@ -245,6 +250,9 @@ export async function getWorkflowScenes(roleSlug: string) {
             slug: item.slug,
             description: item.description ?? "",
             status: item.isGenerateEntry ? "生成入口" : "场景卡片",
+            sceneId: item.sceneDefinition?.sceneId ?? null,
+            href: item.sceneDefinition?.sceneId ? `/scenes/${item.sceneDefinition.sceneId}` : undefined,
+            bound: Boolean(item.sceneDefinition?.sceneId),
           })) ?? [],
       };
     },

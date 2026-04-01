@@ -7,14 +7,13 @@ const baseLinks = [
   { href: "/", label: "首页" },
   { href: "/opc", label: "OPC" },
   { href: "/workflow", label: "工作流" },
-  { href: "/scenes", label: "场景 AGENT" },
   { href: "/workspace", label: "我的工作台" },
 ] as const;
 
 export async function TopNav() {
   const user = await getCurrentUser();
   const links = user?.isAdmin
-    ? [...baseLinks.slice(0, 4), { href: "/admin/scenes", label: "后台" }, baseLinks[4]]
+    ? [...baseLinks.slice(0, 3), { href: "/admin/scenes", label: "后台" }, baseLinks[3]]
     : baseLinks;
 
   return (

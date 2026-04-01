@@ -13,7 +13,7 @@ const baseLinks = [
 export async function TopNav() {
   const user = await getCurrentUser();
   const links = user?.isAdmin
-    ? [...baseLinks.slice(0, 3), { href: "/admin/scenes", label: "后台" }, baseLinks[3]]
+    ? [...baseLinks.slice(0, 3), { href: "/scenes", label: "场景 AGENT" }, { href: "/admin/scenes", label: "后台" }, baseLinks[3]]
     : baseLinks;
 
   return (
